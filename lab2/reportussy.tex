@@ -1,0 +1,236 @@
+\documentclass[a4paper, 12pt]{report}
+\usepackage[hidelinks]{hyperref}
+\usepackage[a4paper, margin=2cm]{geometry}
+\usepackage[english, russian]{babel}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{xcolor}
+\usepackage{minted}
+
+
+\setlength{\parindent}{0em}
+\setlength{\parskip}{0pt}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    {\large \textbf{ФЕДЕРАЛЬНОЕ ГОСУДАРСТВЕННОЕ АВТОНОМНОЕ ОБРАЗОВАТЕЛЬНОЕ УЧРЕЖДЕНИЕ ВЫСШЕГО ОБРАЗОВАНИЯ} \par}
+    {\large «НАЦИОНАЛЬНЫЙ ИССЛЕДОВАТЕЛЬСКИЙ УНИВЕРСИТЕТ ИТМО» \par}
+    \vspace{9cm}
+    {\large {Отчёт по лабораторной работе} \par}
+    {\large \textbf{«Лабораторная работа №2 по ЧМА»} \par}
+
+    \vfill 
+    \begin{flushright}
+        {\large Выполнили работу: \par}
+        {\large Косарев И. А., J3110 \par}
+        {\large Кащеев М. Н., J3111 \par}
+        {\large Капустина Ю. И., J3110\par}
+        \vspace{1cm}
+    \end{flushright}
+    \vspace{1cm}
+    {\large Санкт-Петербург \\ 2025}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\chapter*{Введение}
+\addcontentsline{toc}{chapter}{Введение}
+\setcounter{chapter}{1}
+\setcounter{section}{0}
+
+Цель: познакомиться с понятиями сингулярного разложения, степенного метода и метода Якоби; применить 
+итерационные методы на практике
+
+\section*{Задачи}
+\begin{itemize}
+    \item Изучить понятия сингулярного разложения
+    \item Реализовать алгоритм степенного метода
+    \item Реализовать алгоритм сингулярного разложения
+    \item Реализовать алгоритм плоских вращений Якоби
+    \item Обработать изображение, используя указанные методы
+\end{itemize}
+
+\chapter*{Теоретическая часть}
+\addcontentsline{toc}{chapter}{Теоретическая часть}
+\setcounter{chapter}{2}
+\setcounter{section}{0}
+
+\section{Степенной метод}
+
+Пусть \( A \) — квадратная матрица размера \( n \times n \). Степенной метод позволяет найти наибольшее по модулю собственное значение \( \lambda_1 \) и соответствующий собственный вектор \( \mathbf{v}_1 \).
+
+
+{Алгоритм нахождения собственнного вектора:} 
+
+\begin{enumerate}
+    \item Выбираем начальный вектор : \(\mathbf{v_0}\) - не нулевой. 
+   
+    \item Умножаем матрицу на текущий вектор:
+    \[
+    \mathbf{v_k} = A\mathbf{v_{k-1}}
+    \]
+    \item Нормируем полученный вектор:
+    \[
+    \mathbf{v_k} = \frac{\mathbf{v_k}}{\|\mathbf{v_k}\|}
+    \]
+    \item Проверяем условие сходимости:
+    \[
+    \|\mathbf{v_k} - \mathbf{v_{k-1}}\| < \varepsilon
+    \]
+    Если условие выполняется, процесс завершается. Если нет продолжаем выполнять пункты 2 и 3.
+
+    \item Вычисляем оценку Рэлея для собственного значения:
+    \[
+    \lambda = \frac{\mathbf{v}^T\mathbf{A}\mathbf{v}}{\mathbf{v}^T\mathbf{v}}
+    \]
+    
+\end{enumerate}
+
+
+
+Метод возвращает приближенное значение наибольшего собственного значения $\lambda$ и соответствующий собственный вектор $\mathbf{v}$. \\
+\\
+
+\section{Сингулярное разложение}
+
+\begingroup
+\renewcommand{\labelitemi}{\labelitemiv}
+
+Для любой матрицы $A$ размера $m \times n$ существует {сингулярное разложение} (SVD):
+\[
+A = U \Sigma V^T
+\]
+где:
+\begin{itemize}
+    \item $U$ - матрица {левых сингулярных векторов} (столбцы $\mathbf{u}_i$),
+    \item $\Sigma$ - диагональная матрица {сингулярных чисел} ($\sigma_1 \geq \sigma_2 \geq \dots \geq \sigma_r > 0$),
+    \item $V$ - матрица {правых сингулярных векторов} (столбцы $\mathbf{v}_i$).
+\end{itemize} 
+Связь с собственными векторами:
+\begin{itemize}
+    \item Правые сингулярные векторы $\mathbf{v}_i$ - собственные векторы матрицы $A^T A$
+    \item Левые сингулярные векторы $\mathbf{u}_i$ - собственные векторы матрицы $A A^T$
+\end{itemize}
+\endgroup
+
+
+\textbf{Алгоритм нахождения сингулярных векторов}
+
+\begin{itemize}
+    \item {Шаг 1: Вычисление $A^T A$ и $A A^T$}
+
+    \[
+A^T A \quad \text{(матрица $n \times n$)} \quad \text{и} \quad A A^T \quad \text{(матрица $m \times m$)}
+\]
+
+\item{Шаг 2: Нахождение правых сингулярных векторов 
+$\mathbf{v}_i$}
+\begin{enumerate}
+    \item Решаем уравнение:
+    \[
+    (A^T A) \mathbf{v}_i = \lambda_i \mathbf{v}_i
+    \]
+    \item Нормируем $\mathbf{v}_i$ (чтобы $\|\mathbf{v}_i\| = 1$)
+    \item Столбцы $V$ - это $\mathbf{v}_i$, упорядоченные по убыванию $\lambda_i$
+\end{enumerate}
+
+
+\item {Шаг 3: Нахождение левых сингулярных векторов 
+$\mathbf{u}_i$}
+\begin{enumerate}
+    \item Решаем уравнение:
+    \[
+    (A A^T) \mathbf{u}_i = \lambda_i \mathbf{u}_i
+    \]
+    \item Нормируем $\mathbf{u}_i$
+    \item Столбцы $U$ - это $\mathbf{u}_i$, упорядоченные по убыванию $\lambda_i$
+\end{enumerate}
+
+
+
+\item{Шаг 4: Связь между $\mathbf{u}_i$ и $\mathbf{v}_i$}
+Если $\sigma_i \neq 0$, то:
+\[
+\mathbf{u}_i = \frac{A \mathbf{v}_i}{\sigma_i}, \quad \mathbf{v}_i = \frac{A^T \mathbf{u}_i}{\sigma_i}
+\]
+
+
+
+\item{Шаг 5: Построение $\Sigma$}
+\[
+\Sigma = \text{diag}(\sigma_1, \sigma_2, \dots, \sigma_r), \quad \sigma_i = \sqrt{\lambda_i}
+\]
+
+
+
+\end{itemize}
+
+\section{Метод Якоби}
+
+
+Метод Якоби является итерационным алгоритмом, который предназначен для диагонализации симметричных матриц путём последовательного обнуления их элементов вне диагонали с помощью ортогональных преобразований (то есть вращений). В результате матрица становится диагональной, а её элементы на диагонали становятся собственными значениями.
+
+Для симметрической матрицы \( A \in \mathbb{R}^{n \times n} \) всегда существует ортогональная матрица \( Q \), такая, что:
+\[
+Q^T A Q = D,
+\]
+где \( D \)~--- диагональная матрица собственных значений \( \lambda_i \).
+
+\subsection*{Плоское вращение}
+Плоское вращение происходит при построении матрицы Якоби: на каждой итерации выбирается пара индексов \( (p, q) \) и строится матрица вращения \( J \), которая обнуляет элемент \( A_{pq} \) после преобразования: 
+\[
+A' = J^T A J.
+\]
+Матрица \( J \) имеет вид:
+\[
+J = 
+\begin{pmatrix}
+1         & \cdots  & 0        & \cdots  & 0         \\
+\vdots    & \cos\theta & \cdots  & -\sin\theta & \vdots    \\
+0         & \cdots  & 1        & \cdots  & 0         \\
+\vdots    & \sin\theta & \cdots  & \cos\theta & \vdots    \\
+0         & \cdots  & 0        & \cdots  & 1
+\end{pmatrix},
+\]
+где \( \theta \)~--- угол вращения, вычисляемый из условия обнуления \( A_{pq} \).
+
+\subsection*{Вычисление угла \( \theta \)}
+Угол \( \theta \) определяется формулой:
+\[
+\theta = \frac{1}{2} \arctan\left(\frac{2A_{pq}}{A_{pp} - A_{qq}}\right).
+\]
+Данная формула получается из условия обнуления элемента \( A'_{pq} \) после преобразования \( A' = J^T A J \). Элемент \( A'_{pq} \) равен:
+\[
+A'_{pq} = \frac{1}{2}(A_{pp} - A_{qq}) \sin(2\theta) + A_{pq} \cos(2\theta).
+\]
+Приравнивая \( A'_{pq} = 0 \), получаем:
+\[
+\tan(2\theta) = \frac{2A_{pq}}{A_{qq} - A_{pp}}.
+\]
+
+\subsection*{Критерий остановки}
+Критерий остановки: норма внедиагональных элементов \( \| \text{off}(A) \|_F \) (сумма квадратов внедиагональных элементов) становится меньше заданного допуска \( \epsilon \).
+
+\subsection*{Доказательство сходимости}
+После каждого вращения сумма квадратов внедиагональных элементов уменьшается на \( 2A_{pq}^2 \). Поскольку на каждой итерации выбирается максимальный внедиагональный элемент, последовательность \( \| \text{off}(A) \|_F \)  (то есть фробениусова норма, которая вычисляется как: \(\sqrt{
+    \sum\limits_{\substack{i \neq j}} A_{ij}^2
+}\) ) монотонно убывает и стремится к нулю.
+
+
+\chapter*{Практическая часть}
+\addcontentsline{toc}{chapter}{Практическая часть}
+\setcounter{chapter}{3}
+\setcounter{section}{0}
+
+В процессе выполнения лабораторной работы было замечено, что в процессе вычисления собственных векторов
+матрицы ковариации могли возникать отрицательные собственные значения. Вероятно, это происходило из-за 
+погрешности вычислений 
+
+
+
+\end{document}
