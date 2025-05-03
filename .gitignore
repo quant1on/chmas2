@@ -2,3 +2,4 @@ reportussy.*
 !reportussy.pdf
 !reportussy.tex
 __pycache__
+_minted
